@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using RouteCompany.BLL.Services.Classes;
+using RouteCompany.BLL.Services.Interfaces;
 using RouteCompany.DAL.Data.Contexts;
 using RouteCompany.DAL.Data.Reposatories;
 
@@ -20,6 +22,9 @@ namespace RouteCompany.PL
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));  // success only if the section is ConnectionStrings.
             });
             builder.Services.AddScoped<IDepartmentReposatory, DepartmentReposatory>();
+            builder.Services.AddScoped<IEmployeeReposatory, EmployeeReposatory>();
+            builder.Services.AddScoped<IEmployeeServices,EmployeeServices>();
+            builder.Services.AddScoped<IDepartmentService,DepartmentService>();
             #endregion
 
             var app = builder.Build();
