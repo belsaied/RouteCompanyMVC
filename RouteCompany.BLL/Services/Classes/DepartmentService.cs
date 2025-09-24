@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RouteCompany.BLL.Services.Classes
 {
-    public class DepartmentService(DepartmentReposatory _departmentReposatory) : IDepartmentService
+    public class DepartmentService(IDepartmentReposatory _departmentReposatory) : IDepartmentService
     {
         private readonly IDepartmentReposatory departmentReposatory = _departmentReposatory;
 
@@ -59,7 +59,7 @@ namespace RouteCompany.BLL.Services.Classes
         {
             var department = new Department()
             {
-                Id = createDepartementDTO.ID,
+                //Id = createDepartementDTO.ID,
                 Name = createDepartementDTO.Name,
                 Code = createDepartementDTO.Code,
                 Description = createDepartementDTO.Description,
@@ -67,6 +67,7 @@ namespace RouteCompany.BLL.Services.Classes
             };
 
             return departmentReposatory.Create(department);
+            
         }
 
         // Update:
