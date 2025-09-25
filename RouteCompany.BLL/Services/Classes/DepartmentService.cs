@@ -75,12 +75,11 @@ namespace RouteCompany.BLL.Services.Classes
         {
             return departmentReposatory.Update(new Department()
             {
-                Id = updateDepartmentDTO.Dept_ID,
+                Id = updateDepartmentDTO.Id,
                 Name = updateDepartmentDTO.Name,
                 Code = updateDepartmentDTO.Code,
                 Description = updateDepartmentDTO.Description,
-                ModifiedBy = updateDepartmentDTO.ModifiedBy,
-                ModifiedOn = updateDepartmentDTO.ModifiedOn
+                CreatedOn = updateDepartmentDTO.CreatedOn,
             });
         }
 

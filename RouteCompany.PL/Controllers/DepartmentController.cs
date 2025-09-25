@@ -50,7 +50,7 @@ namespace RouteCompany.PL.Controllers
                     else
                     {
                         _logger.LogError($"Department Can't be created because {ex}");
-                        return View("ErrorView");   // I don't have it yet but the catch will not be logged because it's the happy scenario.
+                        return View("ErrorView",ex);   // I don't have it yet but the catch will not be logged because it's the happy scenario.
                     }
 
                 }
@@ -84,6 +84,100 @@ namespace RouteCompany.PL.Controllers
                 CreatedOn = department.CreatedOn.HasValue ? department.CreatedOn.Value : default,
             };
             return View(departmentVM);
+        }
+
+        [HttpPost]
+        public IActionResult Edit([FromRoute] int? id ,DepartmentEditVM departmentEditVM)
+        {
+            if (!ModelState.IsValid) return View(departmentEditVM);
+
+            try
+                {
+                    if (!id.HasValue) return BadRequest();
+                    var UpdatedDeptDto = new UpdateDepartmentDTO()
+                    {
+                        Id = id.Value,
+                        Code = departmentEditVM.Code,
+                        Name = departmentEditVM.Name,
+                        Description = departmentEditVM.Description,
+                        CreatedOn = departmentEditVM.CreatedOn,
+                    };
+                    int result = _departmentService.UpdateDepartment(UpdatedDeptDto);
+                    if (result > 0)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Department Can't be Updated");
+                        return View(departmentEditVM);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log Error of the Development Env => console.
+                    if (_env.IsDevelopment())
+                    {
+                        _logger.LogError($"Department Can't be created because {ex.Message}");
+                        return View(departmentEditVM);
+                        // stay in this view .
+                    }
+                    else
+                    {
+                        _logger.LogError($"Department Can't be created because {ex}");
+                        return View("ErrorView",ex);   // I don't have it yet but the catch will not be logged because it's the happy scenario.
+                    }
+
+                }
+                
+            
+            
+
+        }
+        #endregion
+        #region Delete
+        // Get => Render View
+        [HttpGet]
+        public IActionResult Delete(int? id)
+        {
+            if(!id.HasValue) return BadRequest();
+            var department = _departmentService.GetDepartmentById(id.Value);
+            if (department == null) return NotFound();
+            return View (department);
+        }
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            if (id == 0) return BadRequest();
+            try
+            {
+                bool IsDeleted = _departmentService.DeleteDepartment(id);
+                if(IsDeleted)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Department can't be Deleted");
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log Error of the Development Env => console.
+                if (_env.IsDevelopment())
+                {
+                    _logger.LogError($"Department Can't be created because {ex.Message}");
+                    // stay in this view .
+                }
+                else
+                {
+                    _logger.LogError($"Department Can't be created because {ex}");
+                    return View("ErrorView", ex);   // I don't have it yet but the catch will not be logged because it's the happy scenario.
+                }
+
+            }
+            return RedirectToAction(nameof(Index), new { id });
         }
         #endregion
     }

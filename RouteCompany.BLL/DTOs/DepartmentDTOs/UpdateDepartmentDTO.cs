@@ -8,11 +8,11 @@ namespace RouteCompany.BLL.DTOs.DepartmentDTOs
 {
     public class UpdateDepartmentDTO
     {
-        public int Dept_ID { get; set; }
+        public int Id { get; set; }   // for Update in Post.
         public string Name { get; set; } = null!;
         public string Code { get; set; } = null!;
         public string? Description { get; set; }
-        public int ModifiedBy { get; set; }   
-        public DateTime? ModifiedOn { get; set; }
+
+        public DateTime? CreatedOn { get; set; }
     }
 }
