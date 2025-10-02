@@ -9,15 +9,19 @@ namespace RouteCompany.BLL.DTOs.EmployeeDTOs
     public class EmployeeDetailsDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public int Age { get; set; }
-        public string Address { get; set; } = string.Empty;
-        public bool IsActive { get; set; }
+        public string Name { get; set; } = null!;
+        public int? Age { get; set; }
+        public string? Address { get; set; }
         public decimal Salary { get; set; }
-        public string Email { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public DateTime HiringDate { get; set; }
-        public string Gender { get; set; } = string.Empty;
-        public string EmployeeType { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
+        public DateOnly HiringDate { get; set; }
+        public string Gender { get; set; }
+        public string EmployeeType { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public int ModifiedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
     }
 }

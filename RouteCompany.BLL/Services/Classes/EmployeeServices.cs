@@ -1,7 +1,9 @@
-﻿using RouteCompany.BLL.DTOs.EmployeeDTOs;
-using RouteCompany.BLL.Factories;
+﻿using AutoMapper;
+using RouteCompany.BLL.DTOs.EmployeeDTOs;
+
 using RouteCompany.BLL.Services.Interfaces;
-using RouteCompany.DAL.Data.Reposatories;
+using RouteCompany.DAL.Data.Reposatories.Interfaces;
+using RouteCompany.DAL.Models.EmployeeModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,69 +12,86 @@ using System.Threading.Tasks;
 
 namespace RouteCompany.BLL.Services.Classes
 {
-    public class EmployeeServices(IEmployeeReposatory employeeReposatory) : IEmployeeServices
+    public class EmployeeServices(IEmployeeReposatory _employeeReposatory ,IMapper _mapper) : IEmployeeServices
     {
-        private readonly IEmployeeReposatory _employeeReposatory = employeeReposatory;
-
-        // Get All Employees
-        public IEnumerable<AllEmployeesDTO> GetAllEmployees()
+        // GetAll
+        public IEnumerable<AllEmployeesDTO> GetAllEmployees(bool withTarcking = false)
         {
-            var employees = _employeeReposatory.GetAll();
-            var employeesDTO = employees.Select(e => new AllEmployeesDTO
-            {
-                Id = e.Id,
-                Name = e.Name,
-                Email = e.Email,
-                Age = e.Age,
-                IsActive = e.IsActive,
-                Salary = e.Salary,
-                Gender = e.Gender,
-                EmployeeType = e.EmployeeType
-            });
-            return employeesDTO;
+            var employee = _employeeReposatory.GetAll(withTarcking);
+            // mapping to DTo
+            var employeeDto = _mapper.Map<IEnumerable<Employee>, IEnumerable<AllEmployeesDTO>>(employee);
+            #region Manual mapping
+            //var employeeDto = employee.Select(e => new AllEmployeesDTO()
+            //{
+            //    Id = e.Id,
+            //    Name = e.Name,
+            //    Age = e.Age,
+            //    Salary = e.Salary,
+            //    IsActive = e.IsActive,
+            //    Email = e.Email,
+            //    Gender = e.Gender.ToString(),
+            //    EmployeeType = e.EmployeeType.ToString(),
+            //}); 
+            #endregion
+            return employeeDto;
         }
-
-        // Get Employee By Id
+        // GetById
         public EmployeeDetailsDTO? GetEmployeeById(int id)
         {
-            var employee = _employeeReposatory.GetById(id);
-            if (employee == null || employee.IsDeleted) return null;
+            var result = _employeeReposatory.GetById(id);
+            return result is null ? null : _mapper.Map<Employee, EmployeeDetailsDTO>(result);
 
-            return new EmployeeDetailsDTO
-            {
-                Id = employee.Id,
-                Name = employee.Name,
-                Age = employee.Age,
-                Address = employee.Address,
-                IsActive = employee.IsActive,
-                Salary = employee.Salary,
-                Email = employee.Email,
-                PhoneNumber = employee.PhoneNumber,
-                HiringDate = employee.HiringDate,
-                Gender = employee.Gender,
-                EmployeeType = employee.EmployeeType
-            };
+
+            #region Manual Mapping.
+            // Map 
+            //return new EmployeeDetailsDTO()
+            //{
+            //    Id = result.Id,
+            //    Name = result.Name,
+            //    Age = result.Age,
+            //    Salary = result.Salary,
+            //    IsActive = result.IsActive,
+            //    Email = result.Email,
+            //    Gender = result.Gender.ToString(),
+            //    EmployeeType = result.EmployeeType.ToString(),
+            //    PhoneNumber = result.PhoneNumber,
+            //    HiringDate = DateOnly.FromDateTime(result.HiringDate),
+            //    CreatedBy = 1,
+            //    CreatedOn = result.CreatedOn,
+            //    ModifiedBy = 1,
+            //    ModifiedOn = result.ModifiedOn,
+            //}; 
+            #endregion
+
         }
-
-        // Create Employee
-
+        // Create.
         public int CreateEmployee(CreatedEmployeeDTO createdEmployeeDTO)
         {
-            var employee = createdEmployeeDTO.ToEntity();
+           var employee = _mapper.Map<CreatedEmployeeDTO,Employee>(createdEmployeeDTO);
             return _employeeReposatory.Create(employee);
         }
-
-        // Update Employee
-        public int UpdateEmployee(CreatedEmployeeDTO updatedEmployeeDTO)
+        // Update
+        public int UpdateEmployee(UpdatedEmployeeDTO updatedEmployeeDTO)
         {
-            return _employeeReposatory.Update(updatedEmployeeDTO.ToEntity());
+            var employee = _mapper.Map<UpdatedEmployeeDTO, Employee>(updatedEmployeeDTO);
+            return _employeeReposatory.Update(employee);
+        }
+        // Delete
+        public bool DeleteEmployee(int id)
+        {
+            // soft Delete [IsDelted = True]
+            var employee = _employeeReposatory.GetById(id);
+            if(employee is null) return false;
+            else
+            {
+                employee. IsDeleted = true;
+                return _employeeReposatory.Update(employee)> 0 ? true : false;
+            }
         }
 
-        // Delete Employee
-        public int DeleteEmployee(int id)
-        {
-            return _employeeReposatory.Delete(id);
-        }
+        
+
     }
 
 }
+ 

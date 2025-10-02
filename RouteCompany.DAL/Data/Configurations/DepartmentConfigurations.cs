@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RouteCompany.DAL.Models;
+using RouteCompany.DAL.Models.DepartmentModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;

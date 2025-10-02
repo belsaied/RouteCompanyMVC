@@ -55,7 +55,7 @@ namespace RouteCompany.PL.Controllers
 
                 }
             }
-            return View(departementDTO);
+            return View(departementDTO);  // if any problem has happened you will stay in the same page.
         }
 
         #endregion

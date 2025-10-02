@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RouteCompany.DAL.Models.Shared;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RouteCompany.DAL.Models
+namespace RouteCompany.DAL.Models.EmployeeModule
 {
     public class Employee : baseEntity
     {
@@ -38,9 +39,9 @@ namespace RouteCompany.DAL.Models
         public DateTime HiringDate { get; set; }
 
         [Required(ErrorMessage = "Gender is required")]
-        public string Gender { get; set; } = null!;        // "Male" or "Female"
+        public Gender Gender { get; set; }       // "Male" or "Female"
 
         [Required(ErrorMessage = "Employee Type is required")]
-        public string EmployeeType { get; set; } = null!;  // "Parttime" or "Fulltime"
+        public EmployeeType EmployeeType { get; set; }  // "Parttime" or "Fulltime"
     }
 }

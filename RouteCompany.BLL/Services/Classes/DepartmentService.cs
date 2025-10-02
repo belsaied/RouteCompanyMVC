@@ -1,7 +1,8 @@
 ﻿using RouteCompany.BLL.DTOs.DepartmentDTOs;
 using RouteCompany.BLL.Services.Interfaces;
-using RouteCompany.DAL.Data.Reposatories;
+using RouteCompany.DAL.Data.Reposatories.Interfaces;
 using RouteCompany.DAL.Models;
+using RouteCompany.DAL.Models.DepartmentModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +64,7 @@ namespace RouteCompany.BLL.Services.Classes
                 Name = createDepartementDTO.Name,
                 Code = createDepartementDTO.Code,
                 Description = createDepartementDTO.Description,
-
+                CreatedOn = createDepartementDTO.DateOfCreation
             };
 
             return departmentReposatory.Create(department);
@@ -87,12 +88,13 @@ namespace RouteCompany.BLL.Services.Classes
         public bool DeleteDepartment(int id)
         {
             var departments = departmentReposatory.GetById(id);
-            if (departments == null)
+            if (departments == null) return false;
+            else
             {
-                return false;
+                departments.IsDeleted=true;
+                return departmentReposatory.Update(departments) > 0 ? true : false;
             }
-            int numberOfRows = departmentReposatory.Delete(departments.Id);
-            return numberOfRows > 0 ? true : false;
+
         }
     }
 }

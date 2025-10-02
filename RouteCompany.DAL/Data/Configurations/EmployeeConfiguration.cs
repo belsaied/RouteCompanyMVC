@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RouteCompany.DAL.Models;
+using RouteCompany.DAL.Models.EmployeeModule;
+using RouteCompany.DAL.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,16 +55,14 @@ namespace RouteCompany.DAL.Data.Configurations
                 .IsRequired()
                 .HasColumnType("date")
                 .HasComment("Date when employee was hired");
+            // As the database can't understand the Enum i must do a conversion by mapping and then parse it into string.
+            builder.Property(e => e.Gender).HasConversion(
+                (empGender) => empGender.ToString(),
+                (gender) => (Gender)Enum.Parse(typeof(Gender), gender));
 
-            builder.Property(e => e.Gender)
-                .IsRequired()
-                .HasMaxLength(10)
-                .HasComment("Employee gender - Male or Female");
-
-            builder.Property(e => e.EmployeeType)
-                .IsRequired()
-                .HasMaxLength(15)
-                .HasComment("Employee type - Parttime or Fulltime");
+            builder.Property(e => e.EmployeeType).HasConversion(
+                (empType) => empType.ToString(),
+                (employoyeetype) => (EmployeeType)Enum.Parse(typeof(EmployeeType), employoyeetype));
 
             builder.Property(e => e.CreatedOn)
                 .HasDefaultValueSql("GETDATE()")

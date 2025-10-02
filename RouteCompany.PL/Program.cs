@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RouteCompany.BLL.Mappings;
 using RouteCompany.BLL.Services.Classes;
 using RouteCompany.BLL.Services.Interfaces;
 using RouteCompany.DAL.Data.Contexts;
-using RouteCompany.DAL.Data.Reposatories;
+using RouteCompany.DAL.Data.Reposatories.Classes;
+using RouteCompany.DAL.Data.Reposatories.Interfaces;
 
 namespace RouteCompany.PL
 {
@@ -14,7 +17,12 @@ namespace RouteCompany.PL
 
             #region DI Container.
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            // To Enable AntiForgeryToken automatically on every post method .
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
+           
             // builder.Services.AddScoped<AppDbContext>(); // Scoped: one instance per request
             // it is better to use AddDbContext because it will configure the DbContextOptions for you
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -25,6 +33,8 @@ namespace RouteCompany.PL
             builder.Services.AddScoped<IEmployeeReposatory, EmployeeReposatory>();
             builder.Services.AddScoped<IEmployeeServices,EmployeeServices>();
             builder.Services.AddScoped<IDepartmentService,DepartmentService>();
+            // Allow Dependency Injection for the Auto Mapper  (if i have a single mapping profile if i have more than 1 i must use AddProfiles with syntax changing)
+            builder.Services.AddAutoMapper(Mapping => Mapping.AddProfile(new MappingProfile()));
             #endregion
 
             var app = builder.Build();

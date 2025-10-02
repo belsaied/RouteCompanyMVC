@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RouteCompany.DAL.Data.Configurations;
-using RouteCompany.DAL.Models;
+using RouteCompany.DAL.Models.DepartmentModule;
+using RouteCompany.DAL.Models.EmployeeModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
