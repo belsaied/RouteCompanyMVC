@@ -18,6 +18,10 @@ namespace RouteCompany.DAL.Data.Configurations
             builder.Property(D => D.Code).HasColumnType("varchar(20)").IsRequired();
             builder.Property(D=> D.CreatedOn).HasDefaultValueSql(" GETDATE()"); // to make the default value of CreatedOn is the current date and time 
             builder.Property(D=> D.ModifiedOn).HasComputedColumnSql(" GETDATE()"); // to make the default value of ModifiedOn is the current date and time
+            builder.HasMany(D => D.Employees)
+                .WithOne(E => E.Department)
+                .HasForeignKey(E => E.DepartmentId)
+                .OnDelete(DeleteBehavior.SetNull);  // on removal the id go to null.
         }
     }
 }

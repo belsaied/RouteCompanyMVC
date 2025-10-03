@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RouteCompany.BLL.DTOs.EmployeeDTOs;
+using RouteCompany.BLL.Services.Classes;
 using RouteCompany.BLL.Services.Interfaces;
 using RouteCompany.DAL.Models.EmployeeModule;
 using RouteCompany.DAL.Models.Shared;
+using RouteCompany.PL.ViewModels;
 
 namespace RouteCompany.PL.Controllers
 {
@@ -12,6 +15,7 @@ namespace RouteCompany.PL.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            ViewData["Message"] = "Hello to Department Index ";
             var employee = _employeeService.GetAllEmployees();
             return View(employee);
         }
@@ -20,17 +24,32 @@ namespace RouteCompany.PL.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+
             return View();
         }
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public IActionResult Create(CreatedEmployeeDTO createdEmployeeDTO)
+        public IActionResult Create(EmployeeViewModel employeeViewModel)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var employee = _employeeService.CreateEmployee(createdEmployeeDTO);
+                    // last modification to allow partial view to attach the department after enabling the relationship.
+                    var employee = _employeeService.CreateEmployee(new CreatedEmployeeDTO()
+                    {
+                        Name= employeeViewModel.Name,
+                        Age = employeeViewModel.Age,
+                        Salary=employeeViewModel.Salary,
+                        Address=employeeViewModel.Address,
+                        IsActive=employeeViewModel.IsActive,
+                        DepartmentId=employeeViewModel.DepartmentId,
+                        Email=employeeViewModel.Email,
+                        EmployeeType=employeeViewModel.EmployeeType,
+                        Gender=employeeViewModel.Gender,
+                        PhoneNumber=employeeViewModel.PhoneNumber,
+
+                    });
                     if (employee > 0)
                     {
                         return RedirectToAction(nameof(Index));
@@ -53,7 +72,8 @@ namespace RouteCompany.PL.Controllers
                     }
                 }
             }
-            return View(createdEmployeeDTO);
+
+            return View(employeeViewModel);
         }
         #endregion
         #region Details
@@ -72,9 +92,9 @@ namespace RouteCompany.PL.Controllers
             if (!id.HasValue) return BadRequest();
             var employee = _employeeService.GetEmployeeById(id.Value);
             if (employee is null) return NotFound();
-            var employeeDto = new UpdatedEmployeeDTO()
+            var employeeVM = new EmployeeViewModel()
             {
-                Id = id.Value,
+                
                 Name = employee.Name,
                 Age = employee.Age,
                 Address = employee.Address,
@@ -86,21 +106,39 @@ namespace RouteCompany.PL.Controllers
                 Gender = Enum.Parse<Gender>(employee.Gender),  // Here i don't use ToString because i cast from Enum to string.
                 EmployeeType = Enum.Parse<EmployeeType>(employee.EmployeeType),
             };
-            return View(employeeDto);
+            return View(employeeVM);
         }
         [HttpPost]
-        public IActionResult Edit([FromRoute] int? id, UpdatedEmployeeDTO updatedEmployeeDTO)
+        public IActionResult Edit([FromRoute] int? id, EmployeeViewModel employeeViewModel)
         {
-            if (!id.HasValue || id != updatedEmployeeDTO.Id) return BadRequest();
-            if (!ModelState.IsValid) return View(updatedEmployeeDTO);
+            if (!id.HasValue ) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+              return View(employeeViewModel);
+            }
+           
             try
             {
-                int result = _employeeService.UpdateEmployee(updatedEmployeeDTO);
+                int result = _employeeService.UpdateEmployee(new UpdatedEmployeeDTO()
+                {
+                    Id = id.Value,
+                    Address=employeeViewModel.Address,
+                    Age=employeeViewModel.Age,
+                    IsActive=employeeViewModel.IsActive,
+                    Gender=employeeViewModel.Gender,
+                    Email=employeeViewModel.Email,
+                    EmployeeType=employeeViewModel.EmployeeType,
+                    Name=employeeViewModel.Name,
+                    HiringDate=employeeViewModel.HiringDate,
+                    Salary=employeeViewModel.Salary,
+                    PhoneNumber=employeeViewModel.PhoneNumber,
+                    DepartmentId=employeeViewModel.DepartmentId,
+                });
                 if (result > 0) return RedirectToAction(nameof(Index));
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Employee Can't be updated");
-                    return View(updatedEmployeeDTO);
+                    return View(employeeViewModel);
                 }
             }
             catch (Exception ex)
@@ -115,7 +153,7 @@ namespace RouteCompany.PL.Controllers
                     return View("ErrorView", ex);
                 }
             }
-            return View(updatedEmployeeDTO);
+            return View(employeeViewModel);
         }
         #endregion
         #region Delete

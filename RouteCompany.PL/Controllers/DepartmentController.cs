@@ -13,6 +13,7 @@ namespace RouteCompany.PL.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            ViewData["Message"] = "Hello to Department Index";
             var department = _departmentService.GetAllDepartments();
             return View(department);
         }
@@ -26,37 +27,39 @@ namespace RouteCompany.PL.Controllers
         [HttpPost]
         public IActionResult Create(CreateDepartementDTO departementDTO)
         {
-            // Check if the model is valid or not :
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     int result = _departmentService.AddDepartment(departementDTO);
-                    if(result > 0)
+                    if (result > 0)
                     {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    ModelState.AddModelError(string.Empty, "Department Can't be Created");
-                    
-                }
-                catch (Exception ex)
-                {
-                    // Log Error of the Development Env => console.
-                    if (_env.IsDevelopment())
-                    {
-                        _logger.LogError($"Department Can't be created because {ex.Message}");
-                         // stay in this view .
+                        TempData["Message"] = "Department Created Successfully";
+                        TempData["MessageType"] = "success";
+                        return RedirectToAction(nameof(Index)); // Toast will show on Index page
                     }
                     else
                     {
-                        _logger.LogError($"Department Can't be created because {ex}");
-                        return View("ErrorView",ex);   // I don't have it yet but the catch will not be logged because it's the happy scenario.
+                        TempData["Message"] = "Department Can't be created";
+                        TempData["MessageType"] = "error";
+                        return RedirectToAction(nameof(Index)); // Toast will show on Index page
                     }
-
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Department Can't be created because {ex.Message}");
+                    TempData["Message"] = "An unexpected error occurred while creating department.";
+                    TempData["MessageType"] = "error";
+                    return RedirectToAction(nameof(Index)); // Toast will show on Index page
                 }
             }
-            return View(departementDTO);  // if any problem has happened you will stay in the same page.
+
+            // If model validation failed - DON'T redirect, DON'T use TempData
+            // Just return the view with validation errors
+            ModelState.AddModelError(string.Empty, "Please check the input data.");
+            return View(departementDTO);
         }
+
 
         #endregion
         #region Details

@@ -1,4 +1,5 @@
-﻿using RouteCompany.DAL.Models.Shared;
+﻿using RouteCompany.DAL.Models.DepartmentModule;
+using RouteCompany.DAL.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -43,5 +44,8 @@ namespace RouteCompany.DAL.Models.EmployeeModule
 
         [Required(ErrorMessage = "Employee Type is required")]
         public EmployeeType EmployeeType { get; set; }  // "Parttime" or "Fulltime"
+
+        public Department? Department { get; set; }
+        public int? DepartmentId { get; set; }
     }
 }

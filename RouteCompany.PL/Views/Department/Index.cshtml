@@ -3,8 +3,41 @@
 @{
     ViewData["Title"] = "Index";
 }
+<div class="alert alert-success">
+    @ViewData["Message"]
+</div>
+@if (!string.IsNullOrEmpty(TempData["Message"] as string))
+{
+    var messageType = TempData["MessageType"] as string ?? "success";
+    var headerText = messageType == "success" ? "Success!!" : "Error!!";
+    var headerClass = messageType == "success" ? "text-success" : "text-danger";
+    var toastClass = messageType == "success" ? "bg-success text-white" : "bg-danger text-white";
 
+    <div aria-live="polite" aria-atomic="true"
+         class="toast-container position-fixed p-3"
+         style="bottom: 25px; right:25px; z-index: 9999;">
+        <div id="notificationToast" class="toast @toastClass" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+            <div class="toast-header">
+                <strong class="me-auto @headerClass">@headerText</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["Message"]
+            </div>
+        </div>
+    </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElement = document.getElementById('notificationToast');
+            if (toastElement) {
+                var toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            }
+        });
+    </script>
+}
 <h1 class="my-3">All Departments</h1>
 <br />
 <br />
@@ -32,17 +65,9 @@
                     <td>@Html.DisplayFor(d => department.Name)</td>
                     <td>@Html.DisplayFor(d => department.Description)</td>
                     <td>@Html.DisplayFor(d => department.DateOfCreation)</td>
-
-                    <td>
-                        <a class="btn btn-primary" asp-controller="Department" asp-action="Details" asp-route-id="@department.DeptID">
-                            <i class="fas fa-eye"></i> Details
-                        </a>
-                    </td>
-                    <td>
-                        <a class="btn btn-success" asp-controller="Department" asp-action="Edit" asp-route-id="@department.DeptID">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                    </td>
+@* 
+Render Partial View *@
+                     <partial name="_buttonsPartialView" model="department.DeptID"></partial>
                     <td>
                         <a class="btn btn-danger" asp-controller="Department" asp-action="Delete" asp-route-id="@department.DeptID">
                             <i class="fas fa-trash"></i> Delete

@@ -13,6 +13,7 @@ namespace RouteCompany.BLL.Mappings
     {
         public MappingProfile()
         {
+            
             CreateMap<Employee,AllEmployeesDTO>()
                 .ForMember(dest => dest.Gender,options => options.MapFrom(src => src.Gender))
                 .ForMember(dest => dest.EmployeeType , options => options.MapFrom(src => src.EmployeeType));
