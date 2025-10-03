@@ -6,10 +6,10 @@ namespace RouteCompany.PL.ViewModels
 {
     public class EmployeeViewModel
     {
-        //public int Id { get; set; }
+        public int Id { get; set; }
         [Required(ErrorMessage = "Name Can't Be Null")]
         [MaxLength(50, ErrorMessage = "Max length should be 50 character")]
-        [MinLength(3, ErrorMessage = "Min length should be 3 characters")]
+        [MinLength(5, ErrorMessage = "Min length should be 5 characters")]
         public string Name { get; set; } = null!;
 
         [Range(22, 35)]
@@ -38,7 +38,7 @@ namespace RouteCompany.PL.ViewModels
         public Gender Gender { get; set; }
 
         public EmployeeType EmployeeType { get; set; }
-        [Display(Name ="Department")]
+        [Display(Name = "Department")]
         public int? DepartmentId { get; set; }
     }
 }
