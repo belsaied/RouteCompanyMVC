@@ -45,7 +45,7 @@ namespace RouteCompany.DAL.Models.EmployeeModule
         [Required(ErrorMessage = "Employee Type is required")]
         public EmployeeType EmployeeType { get; set; }  // "Parttime" or "Fulltime"
 
-        public Department? Department { get; set; }
+        public  virtual Department? Department { get; set; }
         public int? DepartmentId { get; set; }
     }
 }

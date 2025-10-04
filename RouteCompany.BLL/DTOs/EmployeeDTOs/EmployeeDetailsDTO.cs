@@ -25,7 +25,7 @@ namespace RouteCompany.BLL.DTOs.EmployeeDTOs
         public int ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
         [Display(Name = "Department Name")]
-        public string? DepartmentName { get; set; }
+        public string? Department { get; set; }
         public int DepartmentId { get; set; }
     }
 }

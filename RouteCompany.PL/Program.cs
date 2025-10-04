@@ -27,7 +27,9 @@ namespace RouteCompany.PL
             // it is better to use AddDbContext because it will configure the DbContextOptions for you
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));  // success only if the section is ConnectionStrings.
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); 
+                // success only if the section is ConnectionStrings.
+                options.UseLazyLoadingProxies();
             });
             builder.Services.AddScoped<IDepartmentReposatory, DepartmentReposatory>();
             builder.Services.AddScoped<IEmployeeReposatory, EmployeeReposatory>();

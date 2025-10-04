@@ -21,6 +21,6 @@ namespace RouteCompany.BLL.DTOs.EmployeeDTOs
         public string Gender { get; set; }
         [Display(Name = "Employee Type")]
         public string EmployeeType { get; set; }
-        public string? DepartmentName { get; set; }
+        public string? Department { get; set; }  // retrive Department Name.
     }
 }

@@ -12,160 +12,151 @@ namespace RouteCompany.PL.Controllers
     public class EmployeeController(IEmployeeServices _employeeService, IHostEnvironment _env, ILogger<DepartmentController> _logger) : Controller
     {
         #region Index
+        [HttpGet]
         public IActionResult Index()
         {
+            
             var employee = _employeeService.GetAllEmployees();
             return View(employee);
         }
         #endregion
-
-        #region Create
+        #region Create (Get/Post)
         [HttpGet]
         public IActionResult Create()
         {
+
             return View();
         }
         [HttpPost]
-        public IActionResult Create(EmployeeViewModel employeeVM)
+        //[ValidateAntiForgeryToken]
+        public IActionResult Create(EmployeeViewModel employeeViewModel)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var res = _employeeService.CreateEmployee(new CreatedEmployeeDTO
+                    // last modification to allow partial view to attach the department after enabling the relationship.
+                    var employee = _employeeService.CreateEmployee(new CreatedEmployeeDTO()
                     {
-                        Name = employeeVM.Name,
-                        Age = employeeVM.Age,
-                        Address = employeeVM.Address,
-                        Salary = employeeVM.Salary,
-                        IsActive = employeeVM.IsActive,
-                        Email = employeeVM.Email,
-                        PhoneNumber = employeeVM.PhoneNumber,
-                        HiringDate = employeeVM.HiringDate,
-                        Gender = employeeVM.Gender,
-                        EmployeeType = employeeVM.EmployeeType,
-                        DepartmentId = employeeVM.DepartmentId,
+                        Name = employeeViewModel.Name,
+                        Age = employeeViewModel.Age,
+                        Salary = employeeViewModel.Salary,
+                        Address = employeeViewModel.Address,
+                        IsActive = employeeViewModel.IsActive,
+                        DepartmentId = employeeViewModel.DepartmentId,
+                        Email = employeeViewModel.Email,
+                        EmployeeType = employeeViewModel.EmployeeType,
+                        Gender = employeeViewModel.Gender,
+                        PhoneNumber = employeeViewModel.PhoneNumber,
 
                     });
-
-                    if (res > 0)
+                    if (employee > 0)
+                    {
                         return RedirectToAction(nameof(Index));
+                    }
                     else
                     {
-                        ModelState.AddModelError("", "Employee Can not be created");
-
+                        ModelState.AddModelError(string.Empty, "Employee can't be created");
                     }
                 }
                 catch (Exception ex)
                 {
                     if (_env.IsDevelopment())
                     {
-                        _logger.LogError($"Employee Can not be create {ex.Message}");
-
-
+                        _logger.LogError($"Employee can't be created {ex.Message}");
                     }
                     else
                     {
-                        _logger.LogError($"Employee Can not be create {ex}");
-                        return View("Error");
+                        _logger.LogError($"Employee can't be created because :{ex}");
+                        return View("ErrorView", ex);
                     }
                 }
             }
 
-            return View(employeeVM);
+            return View(employeeViewModel);
         }
         #endregion
-
         #region Details
+        [HttpGet]
         public IActionResult Details(int? id)
         {
             if (!id.HasValue) return BadRequest();
-
             var employee = _employeeService.GetEmployeeById(id.Value);
-            if (employee is null) return NotFound();
-            return View(employee);
+            return (employee is null) ? NotFound() : View(employee);
         }
         #endregion
-
         #region Edit
-
         [HttpGet]
         public IActionResult Edit(int? id)
         {
             if (!id.HasValue) return BadRequest();
             var employee = _employeeService.GetEmployeeById(id.Value);
             if (employee is null) return NotFound();
-            var employeedto = new EmployeeViewModel
+            var employeeVM = new EmployeeViewModel()
             {
 
                 Name = employee.Name,
                 Age = employee.Age,
                 Address = employee.Address,
-                Salary = employee.Salary,
                 IsActive = employee.IsActive,
                 Email = employee.Email,
+                Salary = employee.Salary,
                 PhoneNumber = employee.PhoneNumber,
                 HiringDate = employee.HiringDate,
-                Gender = Enum.Parse<Gender>(employee.Gender),
+                Gender = Enum.Parse<Gender>(employee.Gender),  // Here i don't use ToString because i cast from Enum to string.
                 EmployeeType = Enum.Parse<EmployeeType>(employee.EmployeeType),
-                DepartmentId = employee.DepartmentId,
-
+                DepartmentId= employee.DepartmentId,  // to retrive Dept Name in the page of Edit rather leaving it empty.
             };
-            return View(employeedto);
+            return View(employeeVM);
         }
-
         [HttpPost]
-        public IActionResult Edit([FromRoute] int? id, EmployeeViewModel employee)
+        public IActionResult Edit([FromRoute] int? id, EmployeeViewModel employeeViewModel)
         {
-            if (!id.HasValue || id != employee.Id) return BadRequest();
-            if (ModelState.IsValid)
+            if (!id.HasValue) return BadRequest();
+            if (!ModelState.IsValid)
             {
-                try
+                return View(employeeViewModel);
+            }
+
+            try
+            {
+                int result = _employeeService.UpdateEmployee(new UpdatedEmployeeDTO()
                 {
-                    var res = _employeeService.UpdateEmployee(new UpdatedEmployeeDTO
-                    {
-                        Id = employee.Id,
-                        Name = employee.Name,
-                        Age = employee.Age,
-                        Address = employee.Address,
-                        Salary = employee.Salary,
-                        IsActive = employee.IsActive,
-                        Email = employee.Email,
-                        PhoneNumber = employee.PhoneNumber,
-                        HiringDate = employee.HiringDate,
-                        Gender = employee.Gender,
-                        EmployeeType = employee.EmployeeType,
-                        DepartmentId = employee.DepartmentId,
-
-                    });
-                    if (res > 0)
-                        return RedirectToAction(nameof(Index));
-                    else
-                    {
-                        ModelState.AddModelError("", "Employee Can not be updated");
-                    }
-                }
-                catch (Exception ex)
+                    Id = id.Value,
+                    Address = employeeViewModel.Address,
+                    Age = employeeViewModel.Age,
+                    IsActive = employeeViewModel.IsActive,
+                    Gender = employeeViewModel.Gender,
+                    Email = employeeViewModel.Email,
+                    EmployeeType = employeeViewModel.EmployeeType,
+                    Name = employeeViewModel.Name,
+                    HiringDate = employeeViewModel.HiringDate,
+                    Salary = employeeViewModel.Salary,
+                    PhoneNumber = employeeViewModel.PhoneNumber,
+                    DepartmentId = employeeViewModel.DepartmentId,
+                });
+                if (result > 0) return RedirectToAction(nameof(Index));
+                else
                 {
-                    if (_env.IsDevelopment())
-                    {
-                        _logger.LogError($"Employee Can not be updated {ex.Message}");
-
-                    }
-
-                    else
-                    {
-                        _logger.LogError($"Employee Can not be updated {ex}");
-                        return View("Error");
-                    }
+                    ModelState.AddModelError(string.Empty, "Employee Can't be updated");
+                    return View(employeeViewModel);
                 }
             }
-            return View(employee);
+            catch (Exception ex)
+            {
+                if (_env.IsDevelopment())
+                {
+                    _logger.LogError($"Employee can't be Updated {ex.Message}");
+                }
+                else
+                {
+                    _logger.LogError($"Employee can't be updated because {ex}");
+                    return View("ErrorView", ex);
+                }
+            }
+            return View(employeeViewModel);
         }
-
-
         #endregion
-
         #region Delete
         [HttpPost]
         public IActionResult Delete(int id)
@@ -173,30 +164,28 @@ namespace RouteCompany.PL.Controllers
             if (id == 0) return BadRequest();
             try
             {
-                bool isDeleter = _employeeService.DeleteEmployee(id);
-                if (isDeleter)
-                    return RedirectToAction(nameof(Index));
+                bool isDeleted = _employeeService.DeleteEmployee(id);
+                if (isDeleted) return RedirectToAction(nameof(Index));
                 else
-                    ModelState.AddModelError("", "Employee Can not be deleted");
-
+                {
+                    ModelState.AddModelError(string.Empty, "Employee Can't be Deleted");
+                }
             }
             catch (Exception ex)
             {
                 if (_env.IsDevelopment())
                 {
-                    _logger.LogError($"Employee Can not be deleted {ex.Message}");
-                    ModelState.AddModelError("", "Employee Can not be deleted");
-
+                    _logger.LogError($"Employee can't be Deleted {ex.Message}");
+                    ModelState.AddModelError(string.Empty, "Employee Can't be Deleted");
                 }
                 else
                 {
-                    _logger.LogError($"Employee Can not be deleted {ex}");
-                    return View("Error");
+                    _logger.LogError($"Employee Can't be Deleted because {ex}");
+                    return View("ErrorView", ex);
                 }
+
             }
-
             return RedirectToAction(nameof(Delete), new { id });
-
         }
         #endregion
     }

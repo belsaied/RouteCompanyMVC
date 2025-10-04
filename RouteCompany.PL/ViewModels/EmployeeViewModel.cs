@@ -6,7 +6,7 @@ namespace RouteCompany.PL.ViewModels
 {
     public class EmployeeViewModel
     {
-        public int Id { get; set; }
+        
         [Required(ErrorMessage = "Name Can't Be Null")]
         [MaxLength(50, ErrorMessage = "Max length should be 50 character")]
         [MinLength(5, ErrorMessage = "Min length should be 5 characters")]
